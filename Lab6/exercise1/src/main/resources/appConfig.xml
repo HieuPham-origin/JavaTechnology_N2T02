@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="product1" class="org.example.Product" scope="prototype">
+        <property name="id" value="1" />
+        <property name="name" value="iPhone X" />
+        <property name="price" value="209.9" />
+        <property name="description" value="The fisrt phone are used face ID" />
+    </bean>
+
+    <bean id="product2" class="org.example.Product" scope="prototype">
+        <constructor-arg ref="product1"/>
+    </bean>
+
+    <bean id="product3" class="org.example.Product" scope="singleton">
+        <property name="id" value="3" />
+        <property name="name" value="iPhone 15 Pro" />
+        <property name="price" value="999" />
+        <property name="description" value="New model of Apple" />
+    </bean>
+
+</beans>
