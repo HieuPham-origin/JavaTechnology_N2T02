@@ -17,8 +17,6 @@ public class Product {
     private int price;
     private String product_name;
     private String color;
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OrderProduct> orderItems = new ArrayList<>();
     @Builder
     public Product (int id, String product_name, int price, String brand, String color){
         this.product_id = id;
