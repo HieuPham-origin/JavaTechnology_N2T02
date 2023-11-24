@@ -1,7 +1,11 @@
 CREATE DATABASE IF NOT EXISTS lab9;
 
 USE lab9;
-
+CREATE TABLE IF NOT EXISTS `user`(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	username VARCHAR(255),
+	password VARCHAR(255)
+); 
 -- Bảng 'product'
 CREATE TABLE IF NOT EXISTS product (
   product_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -12,7 +16,7 @@ CREATE TABLE IF NOT EXISTS product (
 );
 
 -- Bảng 'order'
-CREATE TABLE IF NOT EXISTS order (
+CREATE TABLE IF NOT EXISTS `order` (
   order_id INT PRIMARY KEY AUTO_INCREMENT,
   day_create DATE,
   status VARCHAR(255)
