@@ -19,4 +19,18 @@ public class Order {
     private String status;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderItems = new ArrayList<>();
+    @Transient
+    public Double getTotalOrderPrice() {
+        double sum = 0D;
+        List<OrderProduct> orderProducts = getOrderItems();
+        for (OrderProduct op : orderProducts) {
+            sum += op.getTotalPrice();
+        }
+        return sum;
+    }
+
+    @Transient
+    public int getNumberOfProducts() {
+        return this.orderItems.size();
+    }
 }

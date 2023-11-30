@@ -1,5 +1,7 @@
 package com.example.lab9.controller;
 
+import com.example.lab9.dto.OrderDto;
+import com.example.lab9.dto.OrderProductDto;
 import com.example.lab9.model.Order;
 import com.example.lab9.model.OrderProduct;
 import com.example.lab9.model.Product;
@@ -14,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,69 +28,56 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/orders")
 public class OrderController {
     @Autowired
-    private OrderService orderService;
+    OrderService orderService;
+
     @Autowired
-    private ProductService productService;
+    ProductService productService;
+
     @Autowired
-    private OrderProductService orderProductService;
+    OrderProductService orderProductService;
+
     @GetMapping(value = { "", "/" })
-    public List<Order> getAllOrders() {
-        return this.orderService.getAllOrders();
+    public @NotNull Iterable<Order> getOrders() {
+        return orderService.getAllOrders();
     }
+
     @GetMapping(value = {"/{id}"})
-    public Optional<Order> getOrder(@PathVariable Integer id) {
-        return orderService.getOrderById(id);
+    public Order getOrder(@PathVariable int id) throws Exception {
+        return orderService.getOrder(id);
+    }
+
+
+
+    private void validateProductsExistence(List<OrderProductDto> orderProducts) {
+        List<OrderProductDto> list = orderProducts
+                .stream()
+                .filter(op -> {
+                    try {
+                        return Objects.isNull(productService.getProductById(op
+                                .getProduct()
+                                .getProduct_id()));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        if (!CollectionUtils.isEmpty(list)) {
+            new Exception("Product not found");
+        }
+    }
+
+    @PutMapping(value = {"/{id}"})
+    public ResponseEntity<Order> updateProduct(@PathVariable int id, @RequestBody OrderDto orderDto) throws Exception {
+        Order order = orderService.getOrder(id);
+        if (orderDto.getStatus() != null) order.setStatus(orderDto.getStatus());
+        orderService.update(order);
+        return new ResponseEntity(order, HttpStatus.OK);
     }
 
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<Product> deleteOrder(@PathVariable Integer id) {
-        orderService.deleteOrder(id);
+    public ResponseEntity<Product> deleteOrder(@PathVariable int id) {
+        orderService.removeById(id);
         return new ResponseEntity(null, HttpStatus.OK);
-    }
-    @PostMapping
-    public ResponseEntity<Order> addOrder(@RequestBody Order order) {
-        List<OrderProduct> orderProducts = order.getOrderItems();
-        for (OrderProduct orderProduct : orderProducts) {
-            Optional<Product> product = productService.getProductById(orderProduct.getProduct().getProduct_id());
-            if (product.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            orderProduct.setOrder(order);
-            orderProduct.setProduct(product.get());
-        }
-
-        order.setOrderItems(orderProducts);
-        Order createdOrder = orderService.createOrder(order);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdOrder.getOrder_id()).toUri());
-        return new ResponseEntity<>(createdOrder, headers, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Integer id, @RequestBody Order order) {
-        Optional<Order> existingOrder = orderService.getOrderById(id);
-        if (existingOrder.isPresent()) {
-            List<OrderProduct> orderProducts = order.getOrderItems();
-            for (OrderProduct orderProduct : orderProducts) {
-                Optional<Product> product = productService.getProductById(orderProduct.getProduct().getProduct_id());
-                if (product.isEmpty()) {
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                }
-                orderProduct.setOrder(existingOrder.get());
-                orderProduct.setProduct(product.get());
-            }
-
-            Order updatedOrder = existingOrder.get();
-            updatedOrder.setDay_create(order.getDay_create());
-            updatedOrder.setStatus(order.getStatus());
-            updatedOrder.setOrderItems(orderProducts);
-
-            orderService.updateOrder(id, updatedOrder);
-            return ResponseEntity.ok(updatedOrder);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 }

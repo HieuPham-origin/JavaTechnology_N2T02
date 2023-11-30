@@ -2,34 +2,31 @@ package com.example.lab9.service;
 
 import com.example.lab9.model.User;
 import com.example.lab9.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public User register(User user){
-        return this.userRepository.save(user);
+    public User update(User user) {
+        return userRepository.save(user);
     }
+
     @Override
-    public boolean authenticate(String username, String password) {
-        // Retrieve the user from the database based on the username
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-
-            // Perform the authentication check
-            if (user.getPassword().equals(password)) {
-                return true;
-            }
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<User> userList = userRepository.findByUsername(username);
+        if (userList == null || userList.isEmpty()) {
+            throw new UsernameNotFoundException(username);
         }
-
-        return false;
+        return userList.get(0);
     }
+
 }

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "orderproduct")
-@Getter @Setter @NoArgsConstructor
+@NoArgsConstructor
 public class OrderProduct {
     @EmbeddedId
     private OrderProductId id;
@@ -21,10 +21,44 @@ public class OrderProduct {
     private Product product;
 
     private int quantity;
-
-    public OrderProduct(Order order, Product product) {
-        this.order = order;
-        this.product = product;
-        this.id = new OrderProductId(order.getOrder_id(), product.getProduct_id());
+    @Transient
+    public Product getProduct() {
+        return this.id.getProduct();
     }
+
+    @Transient
+    public int getTotalPrice() {
+        return getProduct().getPrice() * getQuantity();
+    }
+    public OrderProductId getPk() {
+        return id;
+    }
+
+    public void setPk(OrderProductId id) {
+        this.id = id;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof OrderProduct))
+            return false;
+        OrderProduct other = (OrderProduct) o;
+
+        return this.id == other.id;
+    }
+
+    @Override
+    public final int hashCode() {
+        return id.hashCode();
+    }
+
 }

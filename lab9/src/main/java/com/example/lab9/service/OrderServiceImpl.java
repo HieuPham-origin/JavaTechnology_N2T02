@@ -21,33 +21,23 @@ public class OrderServiceImpl implements OrderService{
         return this.orderRepository.findAll();
     }
     @Override
-    public Order createOrder(Order order){
+    public Order create(Order order) {
         order.setDay_create(LocalDate.now());
         return this.orderRepository.save(order);
     }
+
     @Override
-    public Optional<Order> getOrderById(int id){
-        return orderRepository.findById(id);
+    public void update(Order order) {
+        this.orderRepository.save(order);
     }
 
     @Override
-    public void deleteOrder(int id){
-        Optional<Order> order = orderRepository.findById(id);
-        if(order.isPresent()){
-            orderRepository.deleteById(id);
-        }
-        else{
-            return;
-        }
+    public Order getOrder(int id) {
+        return this.orderRepository.findById(id).get();
     }
+
     @Override
-    public Order updateOrder(int id, Order order){
-        Optional<Order> update = orderRepository.findById(id);
-        if(update.isPresent()){
-            order.setOrder_id(id);
-            return orderRepository.save(order);
-        }else{
-            return null;
-        }
+    public void removeById(int id) {
+        this.orderRepository.deleteById(id);
     }
 }

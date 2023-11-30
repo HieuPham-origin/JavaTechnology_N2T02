@@ -1,34 +1,21 @@
 package com.example.lab9.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter @Setter @NoArgsConstructor
 public class UserDto {
+
+    private int id;
+
     private String username;
+
     private String password;
 
-    // Constructors, getters, and setters
-
-    public UserDto() {
-    }
-
-    public UserDto(String username, String password) {
+    public UserDto(int id, String username, String password) {
+        this.id = id;
         this.username = username;
-        this.password = password;
-    }
-
-    // Getters and setters
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 }

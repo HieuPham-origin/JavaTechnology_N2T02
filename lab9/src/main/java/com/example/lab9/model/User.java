@@ -1,21 +1,64 @@
 package com.example.lab9.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Setter
-@ToString
-@Getter
-@NoArgsConstructor
+import java.util.Collection;
+
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name="user")
+@NoArgsConstructor
+@Setter
+@Getter
+public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+
+    @Column(nullable = false, unique = true)
     private String username;
+
     private String password;
+
+    private Boolean enabled;
+
+    @Builder
+    public User(Long id, String username, String password, Boolean enabled) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled == null ? false : this.enabled;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
 }

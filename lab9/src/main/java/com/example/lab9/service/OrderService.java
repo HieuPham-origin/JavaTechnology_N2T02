@@ -8,8 +8,11 @@ import java.util.Optional;
 
 public interface OrderService {
     List<Order> getAllOrders();
-    Order createOrder(Order order);
-    Optional<Order> getOrderById(int id);
-    void deleteOrder(int id);
-    Order updateOrder(int id, Order order);
+    Order create(Order order);
+
+    void update(Order order);
+
+    Order getOrder(int id);
+
+    void removeById(int id);
 }
